@@ -1,61 +1,47 @@
-# Phishing Email Detector using Scikit-learn
+# Phishing Email Detector
 
-## Task Description
-Developed a machine learning-based Phishing Email Detector that classifies emails as phishing or safe using Scikit-learn and Natural Language Processing (NLP) techniques.
+Classifies emails as phishing or safe using NLP and Scikit-learn. A Streamlit demo shows the verdict, the confidence, and the words that drove the prediction.
 
-## Features
-- Detects phishing and safe emails
-- Uses Machine Learning classification
-- Trains on a phishing email dataset
-- Supports multi-line email input
-- Displays prediction results in real-time
-- Shows model accuracy
-- Displays confusion matrix
-- Beginner-friendly phishing detection system
+## What changed from version 1
+- **v1:** 10 hand-written emails, CountVectorizer + Naive Bayes. The test set had only 2 emails, so the accuracy was not meaningful.
+- **v2:** about 82,000 real emails, duplicates removed, stratified train/test split, TF-IDF with word pairs, hand-crafted features (URL count, IP-based links, urgency words, capital-letter ratio), three models compared, and a web demo.
 
-## Technologies Used
-- Python
-- Pandas
-- Scikit-learn
-- CountVectorizer
-- Multinomial Naive Bayes
+## Results (16,416 test emails)
 
-## Machine Learning Concepts Used
-- Text Vectorization
-- Feature Extraction
-- Naive Bayes Classification
-- Train-Test Split
-- Accuracy Evaluation
-- Confusion Matrix
+| Model | Accuracy | Phishing precision | Phishing recall | Phishing F1 |
+|---|---|---|---|---|
+| Random Forest (TF-IDF + features) | 98.69% | 98.60% | 98.89% | 98.75% |
+| Logistic Regression (TF-IDF + features) | 98.56% | 98.36% | 98.88% | 98.62% |
+| Naive Bayes (TF-IDF) | 96.67% | 98.95% | 94.62% | 96.74% |
 
-## How It Works
-1. A dataset containing phishing and safe emails is created.
-2. Email text is converted into numerical features using CountVectorizer.
-3. The dataset is split into training and testing data.
-4. A Multinomial Naive Bayes model is trained using Scikit-learn.
-5. Users can paste email content for phishing detection.
-6. The model predicts whether the email is phishing or safe.
+Phishing **recall** is the metric I focused on, because a missed phishing email costs more than a false alarm. The original Naive Bayes model missed about 5% of phishing emails; the two upgraded models miss about 1%.
 
-## Output
-The application displays:
-- Prediction result
-- Model accuracy
-- Confusion matrix
-- Email classification
+![Confusion matrix](confusion_matrix.png)
 
-## Example Predictions
+## Demo
+![Phishing example](screenshots/phishing.png)
+![Safe example](screenshots/safe.png)
 
-### Phishing Email
-"Verify your bank account immediately"
+## Run it
+1. Download the Kaggle "Phishing Email Dataset" and place `phishing_email.csv` in this folder.
+2. Install and train:
+```
+pip install -r requirements.txt
+python train.py --data phishing_email.csv --text-col text_combined --label-col label
+```
+3. Start the demo:
+```
+streamlit run app.py
+```
 
-Prediction:
-phishing
+## Limitations
+- The dataset combines several sources (Enron, SpamAssassin and others), so scores near 99% may partly reflect source-specific writing styles. Testing on a separate dataset is the next step.
+- Text only: no header, sender-domain or attachment analysis.
+- Very short messages differ from the long emails the model was trained on.
 
-### Safe Email
-"Meeting scheduled for tomorrow"
+## Next steps
+- Fine-tune DistilBERT and add it to the comparison.
+- Add email-header features.
+- Evaluate on an independent dataset.
 
-Prediction:
-safe
-
-## Note
-This project is created for educational and cybersecurity learning purposes only.
+Educational / cybersecurity learning project.
