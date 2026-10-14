@@ -1,4 +1,4 @@
 archive/
 *.csv
 *.joblib
-__pycache__/
+__pycache__/meta.json
